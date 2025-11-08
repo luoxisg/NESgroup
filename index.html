@@ -23,12 +23,12 @@
 
     /* —— 语言切换：纯 CSS（浮动按钮，默认英文） —— */
     #lang-toggle { position:absolute; left:-9999px; }
-    /* 默认：英文可见，中文隐藏 */
+    /* 默认：英文可见，中文隐藏（英文模式下彻底隐藏中文，包括标签/案例等） */
     .lang-cn { display:none; }
     .lang-en { display:block; }
     .lang-en-inline { display:inline; }
     /* 勾选后：切到中文 */
-    #lang-toggle:checked ~ .container .lang-cn { display:block; }
+    #lang-toggle:checked ~ .container .lang-cn { display:block; } /* 中文模式显式展示中文 */
     #lang-toggle:checked ~ .container .lang-en { display:none; }
     #lang-toggle:checked ~ .container .lang-en-inline { display:none; }
 
@@ -146,12 +146,20 @@
   /* Dark mode */
   @media (prefers-color-scheme:dark){
     :root{ --apple-text:#f5f5f7; --apple-sub:#a1a1a6; --apple-line:#2c2c2e; --apple-bg:#111; }
-    html,body{ background:#000; }
+    html,body{ background:#000; color:var(--apple-text); }
     .container{ background:#000; border-color:var(--apple-line); }
     .hero{ background:linear-gradient(180deg,#0c0c0d 0%, #111113 100%); border-color:var(--apple-line); }
-    .tech-img{ background:#111316; }
+    /* Ensure readable contrast on cards/blocks */
+    .tech-card, .case-card, .contact, .cta { background:#0f0f11; border-color:var(--apple-line); box-shadow:none; }
+    .case-banner{ background:#1c1c1e; color:#fff; }
+    .tech-img{ background:#111316; color:#a1a1a6; }
+    .btn-primary{ background:#fff; color:#000; border-color:#fff; }
     .btn-outline{ color:#f5f5f7; border-color:#f5f5f7; }
     .lang-switcher label{ background:#111; color:#f5f5f7; border-color:var(--apple-line); box-shadow:0 2px 6px rgba(0,0,0,.5); }
+    .footer{ color:var(--apple-sub); }
+    /* Pager in dark */
+    .pager{ background:rgba(17,17,17,.82); border-color:#2c2c2e; }
+    .pager .dot{ background:#3a3a3c; border-color:#4a4a4c; }
   }
 /* —— 移动端分页（Scroll‑Snap） —— */
     @media (max-width: 768px){
@@ -175,6 +183,8 @@
       #p5:target ~ .pager a[href$="#p5"]{ background:#111; border-color:#111; }
     }
 
+/* Extra space on mobile for floating UI overlap */
+  @media (max-width:768px){ .page{ padding-bottom:96px; } }
 </style>
 </head>
 <body>
@@ -281,7 +291,7 @@
     <div class="tech-grid">
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/visual-ai.jpg')">
-          <span class="ph-text">视觉AI / Visual AI</span>
+          <span class="ph-text">Visual AI</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">视觉AI</h4>
@@ -291,7 +301,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/immersion-cooling.jpg')">
-          <span class="ph-text">浸没液冷 / Immersion Cooling</span>
+          <span class="ph-text">Immersion Cooling</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">浸没液冷</h4>
@@ -301,7 +311,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/uav.jpg')">
-          <span class="ph-text">无人机平台 / UAV Platform</span>
+          <span class="ph-text">UAV Platform</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">无人机平台</h4>
@@ -311,7 +321,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/dc-aios.jpg')">
-          <span class="ph-text">数据中心AIOS / DC AIOS</span>
+          <span class="ph-text">Data Center AIOS</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">数据中心AIOS</h4>
@@ -321,7 +331,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/data-security.jpg')">
-          <span class="ph-text">数据安全 / Data Security</span>
+          <span class="ph-text">Data Security</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">数据安全</h4>
@@ -331,7 +341,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/ict.jpg')">
-          <span class="ph-text">ICT规划 / ICT Planning</span>
+          <span class="ph-text">ICT Planning</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">ICT规划</h4>
@@ -341,7 +351,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/smart-building.jpg')">
-          <span class="ph-text">智慧建筑 / Smart Building</span>
+          <span class="ph-text">Smart Building</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">智慧建筑</h4>
@@ -351,7 +361,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/industry4.jpg')">
-          <span class="ph-text">工业4.0 / Industry 4.0</span>
+          <span class="ph-text">Industry 4.0</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">工业4.0</h4>
@@ -361,7 +371,7 @@
       </div>
       <div class="tech-card">
         <div class="tech-img" style="--img:url('images/simulation.jpg')">
-          <span class="ph-text">仿真 (CFD & FEA) / Simulation</span>
+          <span class="ph-text">Simulation (CFD & FEA)</span>
           <i class="tech-img-real" aria-hidden="true"></i>
         </div>
         <h4 class="lang-cn">仿真 (CFD & FEA)</h4>
@@ -391,7 +401,7 @@
         <h3 class="case-head lang-en">Digital Twin for a Major Asian Hub Airport</h3>
         <p class="case-desc lang-cn">建设完整的数字孪生SaaS平台，优化旅客流与行李周转；基于预测性维护提高关键资产可用性与维护准确率。</p>
         <p class="case-desc lang-en">Digital Twin SaaS for a hub airport; improved flow and asset uptime via predictive maintenance.</p>
-        <span class="tag lang-cn">智慧航空</span><span class="tag lang-en">Smart Aviation</span>
+        <span class="tag lang-en">Smart Aviation</span>
         <span class="tag">AI</span><span class="tag">IoT</span>
       </div>
 
@@ -401,7 +411,7 @@
         <h3 class="case-head lang-en">Technical Due Diligence for DC M&A</h3>
         <p class="case-desc lang-cn">为全球私募股权基金提供并购目标的冷却系统（含浸没液冷）、PUE 与 AI 负载承载能力评估，形成技术尽调报告。</p>
         <p class="case-desc lang-en">Technical DD on cooling (incl. immersion), PUE and AI‑readiness for a PE target; delivered an investment‑grade report.</p>
-        <span class="tag lang-cn">智能基础设施</span><span class="tag lang-en">Infra</span>
+        <span class="tag lang-en">Infra</span>
         <span class="tag">M&A</span><span class="tag">Liquid Cooling</span>
       </div>
 
@@ -430,7 +440,8 @@
       <p class="lang-cn">我们提供从战略到落地的一体化方案：自研产品 × 生态协同 × 股权共投（VC版）。</p>
       <p class="lang-en">End‑to‑end delivery: proprietary R&amp;D × ecosystem partnerships × equity co‑investment.</p>
       <div class="btn-row">
-        <a class="btn btn-primary" href="#contact">联系 / Contact</a>
+        <a class="btn btn-primary lang-cn" href="#contact">联系</a>
+        <a class="btn btn-primary lang-en" href="#contact">Contact</a>
         <a class="btn btn-outline" href="#contact">Book a 20‑min Intro</a>
       </div>
     </div>
@@ -468,3 +479,4 @@
   </div>
 </body>
 </html>
+ 
