@@ -1,613 +1,470 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 默认显示英文标题，JS会自动切换 -->
-    <title>NES Group: Building the Future of Deep Tech</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* 字体和基础样式 */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-            background-color: #ffffff;
-            color: #1a202c; /* 更深的灰黑色 */
-            line-height: 1.7;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NES Group: Building the Future of Deep Tech</title>
+  <style>
+    /* —— 基础：更稳的移动端显示 —— */
+    :root { --maxw: 900px; --pad: 40px; }
+    html, body { margin:0; padding:0; background:#f9f9f9; color:#333; }
+    body { font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; line-height:1.7; word-wrap:break-word; overflow-wrap:anywhere; }
+    .container { max-width: var(--maxw); margin: 20px auto; padding: var(--pad); background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.06); }
+    h1 { color:#003366; font-size:clamp(28px, 3.2vw, 40px); font-weight:800; border-bottom:2px solid #003366; padding-bottom:10px; margin-top:0; letter-spacing:.2px; }
+    h2 { color:#003366; font-size:clamp(22px, 2.4vw, 32px); font-weight:700; margin-top:36px; border-bottom:1px solid #eee; padding-bottom:8px; }
+    h3 { color:#004a99; font-size:clamp(18px, 2vw, 24px); font-weight:700; margin-top:24px; }
+    p { font-size:1.05em; margin-bottom:14px; line-height:1.85; }
+    ul, ol { padding-left:22px; margin-bottom:14px; font-size:1.05em; }
+    li { margin-bottom:8px; }
+    .hero { background:#0b3a75; color:#fff; padding:28px 20px; border-radius:12px; margin-bottom:26px; text-align:center; }
+    .hero h1 { color:#fff; border-bottom:none; font-size:clamp(30px, 3.6vw, 44px); margin:0; }
+    .hero p { font-size:clamp(15px, 1.6vw, 18px); opacity:.95; margin-top:8px; }
+    .footer { text-align:center; margin-top:36px; font-size:.95em; color:#7a8699; }
 
-        /* 容器 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
+    /* —— 语言切换：纯 CSS（浮动按钮，默认英文） —— */
+    #lang-toggle { position:absolute; left:-9999px; }
+    /* 默认：英文可见，中文隐藏 */
+    .lang-cn { display:none; }
+    .lang-en { display:block; }
+    .lang-en-inline { display:inline; }
+    /* 勾选后：切到中文 */
+    #lang-toggle:checked ~ .container .lang-cn { display:block; }
+    #lang-toggle:checked ~ .container .lang-en { display:none; }
+    #lang-toggle:checked ~ .container .lang-en-inline { display:none; }
 
-        /* 响应式排版 */
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #002D62; /* 深海军蓝 */
-            line-height: 1.2;
-            margin-bottom: 1rem;
-        }
-        h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #002D62;
-            margin-top: 3.5rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #005A9C; /* 稍亮的蓝色 */
-        }
-        h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #005A9C;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-        p, li {
-            font-size: 1.1rem;
-            color: #2d3748; /* 灰色 */
-            margin-bottom: 1.25rem;
-        }
+    /* 浮动开关（右下角）- 兼容安全区与移动端 */
+    .lang-switcher{ position:fixed; right:max(16px, env(safe-area-inset-right)); bottom:max(16px, env(safe-area-inset-bottom)); z-index:2147483647; }
+    .lang-switcher label{ width:48px; height:48px; border-radius:50%; background:#0b57d0; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.25); border:2px solid #ffffffAA; -webkit-tap-highlight-color:transparent; outline:none; }
+    .lang-switcher label:hover{ filter:brightness(1.05); }
+    .lang-switcher label:focus{ box-shadow:0 0 0 3px rgba(11,87,208,.3), 0 6px 16px rgba(0,0,0,.25); }
+    /* 默认英文 -> 按钮显示“中”（点击切到中文） */
+    .btn-cn-active{ display:inline; }
+    .btn-en-active{ display:none; }
+    /* 进入中文态 -> 按钮显示“EN”（点击切回英文） */
+    #lang-toggle:checked ~ .container .btn-cn-active{ display:none; }
+    #lang-toggle:checked ~ .container .btn-en-active{ display:inline; }
 
-        /* 导航栏和语言切换器 */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #002D62;
-        }
-        #lang-toggle {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #005A9C;
-            background-color: #f0f5fa;
-            border: 1px solid #005A9C;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px; /* 胶囊形状 */
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-        #lang-toggle:hover {
-            background-color: #005A9C;
-            color: #ffffff;
-        }
+    @media (hover:none){ .lang-switcher label{ width:56px; height:56px; font-size:14px; } }
 
-        /* 页眉 */
-        .header {
-            text-align: center;
-            padding: 4rem 1rem;
-            background-color: #f7fafc;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .header .subtitle {
-            font-size: 1.25rem;
-            color: #4a5568;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .header-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 0.5rem;
-            margin-top: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+    /* —— 技术卡片：图片占位 + 悬停显示（零脚本） —— */
+    .tech-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px; margin-top:18px; }
+    .tech-card { position:relative; background:#f9fbff; border-radius:12px; padding:18px; border:1px solid #e0e8f3; box-shadow:0 2px 4px rgba(0,0,0,.03); transition:transform .25s ease, box-shadow .25s ease; overflow:hidden; }
+    .tech-card:hover { transform:translateY(-4px); box-shadow:0 6px 14px rgba(0,0,0,.06); }
+    .tech-img { position:relative; width:100%; height:150px; background:#d8e2f1; border-radius:10px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; color:#2f5573; font-size:.95em; font-weight:700; overflow:hidden; }
+    .tech-img .ph-text { position:relative; z-index:1; text-align:center; padding:0 6px; }
+    .tech-img .tech-img-real { position:absolute; inset:0; background-image: var(--img); background-size:cover; background-position:center; opacity:0; transition:opacity .28s ease; }
+    .tech-card:hover .tech-img .tech-img-real { opacity:1; }
+    /* 移动端：无悬停，直接显示真实图片 */
+    @media (hover:none) { .tech-img .tech-img-real { opacity:1; } .tech-img .ph-text { opacity:0; } }
 
-        /* 通用卡片样式 */
-        .card {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transform: translateY(-4px);
-        }
-        .card-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        .card-content {
-            padding: 1.5rem;
-        }
+    /* —— 顶部提示 —— */
+    .smoke { background:#fffbcc; border:1px solid #f0e68c; padding:10px 12px; margin:10px auto; max-width:calc(var(--maxw) + var(--pad)*2); color:#6b5500; font-weight:700; border-radius:8px; }
 
-        /* 成功案例 - 技术徽章 */
-        .tech-badge {
-            display: inline-block;
-            background-color: #e6f0ff;
-            color: #005A9C;
-            font-size: 0.8rem;
-            font-weight: 500;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
+    /* —— 小屏优化 —— */
+    @media (max-width: 640px) {
+      :root { --pad: 18px; }
+      .container { margin: 12px auto; }
+      ul,ol { padding-left: 18px; }
+    }
 
-        /* 技术前瞻 - 图标 */
-        .tech-icon {
-            width: 40px;
-            height: 40px;
-            color: #005A9C;
-            margin-bottom: 1rem;
-        }
+    /* —— 深色模式 —— */
+    @media (prefers-color-scheme: dark) {
+      html, body { background:#0e1116; color:#e4e7ee; }
+      .container { background:#0f1722; box-shadow:0 1px 0 rgba(255,255,255,.03) inset; border:1px solid rgba(255,255,255,.06); }
+      h1, h2, h3 { color:#cfe0ff; border-color:rgba(255,255,255,.08); }
+      .hero { background:#0b2447; }
+      .footer { color:#9aa7bd; }
+      .lang-switcher label:hover { background:#14233b; }
+      .tech-card { background:#0f1624; border-color:#1b2740; }
+      .tech-img { background:#1d2a44; color:#a9c1e1; }
+      .smoke { background:#2a2f1e; border-color:#5c6b2a; color:#e9f0c3; }
+    }
 
-        /* 呼吁行动 (CTA) */
-        .cta-section {
-            background-color: #002D62;
-            color: #ffffff;
-            padding: 3rem 1.5rem;
-            border-radius: 0.75rem;
-            text-align: center;
-            margin-top: 3.5rem;
-        }
-        .cta-section h2 {
-            color: #ffffff;
-            border-bottom: none;
-            margin-top: 0;
-        }
-        .cta-section p {
-            font-size: 1.15rem;
-            color: #e2e8f0;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 1.5rem;
-        }
-        .cta-button {
-            display: inline-block;
-            background-color: #ffffff;
-            color: #002D62;
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 0.75rem 1.75rem;
-            border-radius: 9999px;
-            text-decoration: none;
-            transition: all 0.2s ease-in-out;
-        }
-        .cta-button:hover {
-            background-color: #f0f5fa;
-            transform: scale(1.05);
-        }
+    /* —— 减少动画（系统“降低动态效果”） —— */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition:none !important; }
+    }
+      /* —— 案例区（Case Studies） —— */
+    .case-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:14px}
+    .case-card{background:#fff;border:1px solid #e6ecf5;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);padding:18px 18px 16px;position:relative;overflow:hidden}
+    .case-head{font-weight:800;color:#0b3a75;margin:0 0 10px;font-size:clamp(18px,1.9vw,20px)}
+    .case-desc{margin:6px 0 12px;color:#334155;line-height:1.8}
+    .case-banner{background:#0b3a75;color:#fff;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-weight:800}
+    .tag{display:inline-block;background:#eef4ff;color:#0b57d0;border:1px solid #d7e3ff;font-weight:700;font-size:.85em;border-radius:999px;padding:6px 10px;margin:6px 8px 0 0}
 
-        /* 页脚 */
-        .footer {
-            text-align: center;
-            padding: 2rem 1.5rem;
-            margin-top: 2rem;
-            color: #718096;
-            border-top: 1px solid #e2e8f0;
-        }
-        .footer .contact-info {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .footer .contact-info span {
-            font-size: 0.95rem;
-        }
-        
-        /* * CSS 语言切换逻辑 (最终修复版 V2)
-         * 默认：`.lang-en-active` 在 <body> 上
-         * 1. 默认 *不隐藏* 任何元素。
-         * 2. 如果 body.lang-en-active, 则 *隐藏* [lang="cn"]
-         * 3. 如果 body.lang-cn-active, 则 *隐藏* [lang="en"]
-         * 这是最安全的逻辑，可避免白屏。
-         */
+    /* —— CTA & 联系 —— */
+    .cta{background:linear-gradient(135deg,#0b3a75,#1c59a3);color:#fff;border-radius:14px;padding:22px 18px;margin-top:30px;box-shadow:0 6px 18px rgba(11,58,117,.25)}
+    .cta h3{color:#fff;margin:0 0 6px;border:0}
+    .cta p{color:#e6eefb;margin:6px 0 14px}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;font-weight:800;text-decoration:none}
+    .btn-primary{background:#ffffff;color:#0b3a75;border:2px solid #fff}
+    .btn-outline{background:transparent;color:#fff;border:2px solid #fff}
 
-        /* 2. 当 .lang-en-active 时，*只*隐藏中文 */
-        body.lang-en-active [lang="cn"] {
-            display: none;
-        }
+    .contact{margin-top:24px;padding:18px;border:1px dashed #cfd8ea;border-radius:12px;background:#f7faff}
+    .contact h4{margin:0 0 10px;color:#0b3a75}
+    .contact p{margin:6px 0}
+    .contact a{color:#0b57d0;text-decoration:none;border-bottom:1px dotted #9bb7ff}
+    /* === Apple.com Style Overrides (A) === */
+  :root { --apple-text:#1d1d1f; --apple-sub:#6e6e73; --apple-line:#e5e5e7; --apple-bg:#f5f5f7; }
+  html,body{ background:#fff; color:var(--apple-text); }
+  .container{ max-width:1040px; background:#fff; border:1px solid var(--apple-line); box-shadow:none; padding:clamp(24px,4vw,56px); margin: clamp(8px,2vw,28px) auto; border-radius:18px; }
+  h1,h2,h3{ color:var(--apple-text); border:0; letter-spacing:-.02em; line-height:1.15; }
+  h1{ font-size:clamp(36px,4.8vw,56px); font-weight:800; margin:0 0 .35em; }
+  h2{ font-size:clamp(24px,3.2vw,36px); font-weight:800; margin:1.6em 0 .6em; }
+  h3{ font-size:clamp(18px,2.2vw,24px); font-weight:700; margin:1.1em 0 .4em; }
+  p,li{ color:var(--apple-text); font-size:clamp(15px,1.2vw,18px); line-height:1.7; }
+  .hero{ background:linear-gradient(180deg,#fbfbfd 0%, #f5f5f7 100%); color:var(--apple-text); border-radius:24px; padding:clamp(28px,5vw,72px) clamp(20px,4vw,48px); text-align:center; border:1px solid var(--apple-line); }
+  .hero h1{ color:var(--apple-text); font-size:clamp(38px,5.2vw,64px); font-weight:800; margin-bottom:.2em; }
+  .hero p{ color:var(--apple-sub); font-weight:600; font-size:clamp(16px,1.4vw,20px); opacity:1; }
+  /* Tech cards — flat, precise */
+  .tech-grid{ gap:24px; }
+  .tech-card{ background:#fff; border:1px solid var(--apple-line); box-shadow:none; border-radius:16px; padding:20px; transition: border-color .2s ease; }
+  .tech-card:hover{ transform:none; box-shadow:none; border-color:#d0d0d4; }
+  .tech-img{ background:#f2f2f5; color:var(--apple-sub); border-radius:14px; height:180px; }
+  .tech-img .tech-img-real{ transition:none; opacity:1; } /* 清爽展示，不用悬停渐现 */
+  .case-card{ background:#fff; border:1px solid var(--apple-line); box-shadow:none; border-radius:16px; }
+  .case-banner{ background:#111; color:#fff; border-radius:12px; font-weight:800; }
+  /* CTA — light, minimal */
+  .cta{ background:#fff; color:var(--apple-text); border:1px solid var(--apple-line); box-shadow:none; border-radius:18px; }
+  .cta h3{ color:var(--apple-text); font-weight:800; }
+  .cta p{ color:var(--apple-sub); }
+  /* Buttons — pill, subtle */
+  .btn{ border-radius:999px; padding:12px 18px; font-weight:700; }
+  .btn-primary{ background:#111; color:#fff; border:1px solid #111; }
+  .btn-primary:hover{ filter:brightness(1.05); }
+  .btn-outline{ background:transparent; color:#111; border:1px solid var(--apple-text); }
+  .btn-outline:hover{ background:#f6f6f6; }
+  /* Contact */
+  .contact{ background:#fff; border:1px dashed var(--apple-line); border-radius:16px; }
+  .contact a{ color:#0066cc; border-bottom:1px solid rgba(0,102,204,.25); }
+  /* Language switch — frosted, subtle */
+  .lang-switcher label{ width:52px; height:52px; background:#fff; color:var(--apple-text); border:1px solid var(--apple-line); box-shadow:0 2px 6px rgba(0,0,0,.08); }
+  .lang-switcher label:hover{ background:#fafafa; }
+  /* Footer */
+  .footer{ color:var(--apple-sub); }
+  /* Dark mode */
+  @media (prefers-color-scheme:dark){
+    :root{ --apple-text:#f5f5f7; --apple-sub:#a1a1a6; --apple-line:#2c2c2e; --apple-bg:#111; }
+    html,body{ background:#000; }
+    .container{ background:#000; border-color:var(--apple-line); }
+    .hero{ background:linear-gradient(180deg,#0c0c0d 0%, #111113 100%); border-color:var(--apple-line); }
+    .tech-img{ background:#111316; }
+    .btn-outline{ color:#f5f5f7; border-color:#f5f5f7; }
+    .lang-switcher label{ background:#111; color:#f5f5f7; border-color:var(--apple-line); box-shadow:0 2px 6px rgba(0,0,0,.5); }
+  }
+/* —— 移动端分页（Scroll‑Snap） —— */
+    @media (max-width: 768px){
+      .container{ height:100svh; overflow-y:auto; scroll-snap-type:y mandatory; }
+      .page{ scroll-snap-align:start; min-height:100svh; padding-bottom:24px; }
+    }
 
-        /* 3. 当 .lang-cn-active 时，*只*隐藏英文 */
-        body.lang-cn-active [lang="en"] {
-            display: none;
-        }
-    </style>
+    /* —— 分页导航（底部圆点） —— */
+    .pager{ display:none; }
+    @media (max-width:768px){
+      .pager{ position:fixed; left:50%; bottom:12px; transform:translateX(-50%); background:rgba(255,255,255,.82); backdrop-filter:saturate(180%) blur(8px); border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:6px 10px; display:flex; gap:8px; z-index:2147483647; }
+      .pager .dot{ width:10px; height:10px; display:block; line-height:10px; text-indent:-9999px; border-radius:50%; background:#c7c7cc; border:1px solid #bdbdc2; }
+      /* :target 高亮（简约） */
+      :target ~ .pager a[href$="#p1"], :target ~ .pager a[href$="#p2"], :target ~ .pager a[href$="#p3"], :target ~ .pager a[href$="#p4"], :target ~ .pager a[href$="#p5"]{ opacity:.8 }
+      /* 默认高亮第1页 */
+      .pager a[href$="#p1"]{ background:#111; border-color:#111; }
+      /* 当定位到任一页时，针对性高亮（利用 :target） */
+      #p2:target ~ .pager a[href$="#p2"],
+      #p3:target ~ .pager a[href$="#p3"],
+      #p4:target ~ .pager a[href$="#p4"],
+      #p5:target ~ .pager a[href$="#p5"]{ background:#111; border-color:#111; }
+    }
+
+</style>
 </head>
+<body>
+  <!-- 只要你看到这条提示，就说明 HTML/CSS 已正确加载（无 JS 依赖）。 -->
+  <!-- 语言切换（纯 CSS）：默认英文；勾选切到中文 -->
+  <input type="checkbox" id="lang-toggle" aria-hidden="true" />
 
-<!-- 默认加载英文 -->
-<body class="lang-en-active">
-
-    <!-- 导航栏 -->
-    <div class="container navbar">
-        <div class="logo">NES Group</div>
-        <button id="lang-toggle" title="切换语言 / Switch Language">
-            <span lang="en">中</span>
-            <span lang="cn">EN</span>
-        </button>
+  <div class="container">
+    <!-- 切换按钮：通过两套标签模拟 active 态 -->
+    <div class="lang-switcher" aria-label="Language Switch">
+      <!-- 默认英文：按钮显示“中”；切到中文后，按钮显示“EN” -->
+      <span class="btn-cn-active"><label for="lang-toggle" title="Switch to 中文">中</label></span>
+      <span class="btn-en-active"><label for="lang-toggle" title="Switch to English">EN</label></span>
     </div>
 
-    <!-- 页眉 -->
-    <header class="header">
-        <h1 lang="en">Building the Future of Deep Tech</h1>
-        <h1 lang="cn">构建深科技未来</h1>
-
-        <p class="subtitle" lang="en">
-            From consulting insight to value co-creation. We are a global Deep Tech conglomerate leveraging R&D and Strategic Capital to solve the world's most complex challenges.
-        </p>
-        <p class="subtitle" lang="cn">
-            从咨询洞察到价值共创。我们是一家全球化的深科技集团，利用“自主研发”与“战略资本”的双轮驱动，解决全球最复杂的挑战。
-        </p>
-        
-        <!-- 页眉图片占位符 -->
-        <img src="/image/header_main.jpg" 
-             alt="Modern building architecture" 
-             class="header-image"
-             onerror="this.onerror=null;this.src='https://placehold.co/1200x300/002D62/FFFFFF?text=NES+Group+Vision';">
-    </header>
-
-    <!-- 主体内容 -->
-    <div class="container">
-
-        <!-- 使命 -->
-        <section>
-            <h2 lang="en">Our Mission: From Consulting Insight to Value Co-Creation</h2>
-            <h2 lang="cn">我们的使命：从咨询洞察到价值共创</h2>
-            <p lang="en">
-                NES Group is a global Deep Tech conglomerate headquartered in Singapore. We have transitioned from traditional consultants to a technology provider that "creates and owns value." Leveraging decades of experience in smart cities and intelligent buildings, we combine a powerful dual-driver model of R&D and Corporate Venture Capital (CVC) to deliver end-to-end Deep Tech solutions for our global clients.
-            </p>
-            <p lang="cn">
-                NES集团是一家总部位于新加坡的全球化深科技集团。我们已从传统的咨询顾问转型为“创造并拥有价值”的技术供应商。凭借在智慧城市和智能建筑领域数十年的深厚经验，我们结合“自主研发”与“企业风险投资 (CVC)”的强大双轮驱动模型，为全球客户提供端到端的深科技解决方案。
-            </p>
-        </section>
-
-        <!-- 新加坡优势 -->
-        <section>
-            <h2 lang="en">The Singapore Advantage: A Global Hub for Deep Tech Innovation</h2>
-            <h2 lang="cn">新加坡优势：全球深科技创新枢纽</h2>
-            
-            <!-- 图片占位符 -->
-            <img src="/image/singapore_skyline.jpg" 
-                 alt="Singapore Skyline" 
-                 class="w-full h-64 object-cover rounded-lg shadow-md mb-6"
-                 onerror="this.onerror=null;this.src='https://placehold.co/1200x250/005A9C/FFFFFF?text=Singapore+Advantage';">
-            
-            <p lang="en">
-                The Singapore government's strong support for innovation, top-tier research institutions, robust IP protection, and vibrant VC ecosystem create an unrivaled environment for Deep Tech. Singapore serves as the perfect bridge between East and West, enabling us to seamlessly integrate cutting-edge global technologies and talent.
-            </p>
-            <p lang="cn">
-                新加坡政府对创新的大力支持、顶级的科研机构、健全的知识产权保护以及活跃的风险投资生态，为深科技创造了无与伦比的环境。新加坡是连接东西方的完美桥梁，使我们能够无缝整合全球的尖端技术与人才。
-            </p>
-            <p lang="en">
-                From this strategic hub, we serve a diverse clientele across the globe, with key markets in **ASEAN, the European Union (EU), and North America**.
-            </p>
-            <p lang="cn">
-                我们以此为战略中心，服务于全球多元化的客户群体，关键市场遍布**东盟 (ASEAN)、欧盟 (EU) 和北美 (North America)**。
-            </p>
-        </section>
-
-        <!-- 核心深科技事业群 -->
-        <section>
-            <h2 lang="en">Core Deep Tech Business Units</h2>
-            <h2 lang="cn">核心深科技事业群</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                
-                <!-- 事业群 1: 智慧城市与咨询 -->
-                <div class="card">
-                    <img src="/image/bu_smartcity.jpg" alt="Smart City" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/002D62/FFFFFF?text=Smart+City';">
-                    <div class="card-content">
-                        <h3 lang="en">Smart Cities &amp; Advisory</h3>
-                        <h3 lang="cn">智慧城市与咨询</h3>
-                        <p lang="en">Leveraging our legacy, we provide strategic consulting and deploy our proprietary 'City OS' and Digital Twin platforms for urban management, sustainability, and security.</p>
-                        <p lang="cn">凭借我们的深厚积淀，我们提供战略咨询，并部署专有的“城市操作系统” (City OS) 和数字孪生平台，用于城市管理、可持续发展与安全。</p>
-                    </div>
-                </div>
-
-                <!-- 事业群 2: 智慧交通 -->
-                <div class="card">
-                    <img src="/image/bu_transport.jpg" alt="Smart Transport" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/002D62/FFFFFF?text=Smart+Transport';">
-                    <div class="card-content">
-                        <h3 lang="en">Smart Transportation</h3>
-                        <h3 lang="cn">智慧交通</h3>
-                        <p lang="en">Developing AI-driven traffic management agents, V2X (Vehicle-to-Everything) communication platforms, and autonomous mobility solutions for next-gen urban logistics.</p>
-                        <p lang="cn">开发人工智能驱动的交通管理代理、V2X (车路协同) 通信平台以及用于下一代城市物流的自动驾驶移动解决方案。</p>
-                    </div>
-                </div>
-
-                <!-- 事业群 3: 智慧航空 -->
-                <div class="card">
-                    <img src="/image/bu_aviation.jpg" alt="Smart Aviation" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/002D62/FFFFFF?text=Smart+Aviation';">
-                    <div class="card-content">
-                        <h3 lang="en">Smart Aviation</h3>
-                        <h3 lang="cn">智慧航空</h3>
-                        <p lang="en">Providing Digital Twin SaaS platforms for airport operations, predictive maintenance on critical assets, and AI-powered resource optimization to enhance efficiency and safety.</p>
-                        <p lang="cn">为机场运营提供数字孪生SaaS平台，对关键资产进行预测性维护，并通过人工智能驱动的资源优化来提升效率和安全性。</p>
-                    </div>
-                </div>
-                
-                <!-- 事业群 4: 智能基础设施 (数据中心) -->
-                <div class="card">
-                    <img src="/image/bu_infrastructure.jpg" alt="Intelligent Infrastructure" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/002D62/FFFFFF?text=Infrastructure';">
-                    <div class="card-content">
-                        <h3 lang="en">Intelligent Infrastructure</h3>
-                        <h3 lang="cn">智能基础设施</h3>
-                        <p lang="en">Designing and deploying high-performance data center solutions, including AIOS (AI Operating Systems) and advanced Immersion Cooling systems for sustainable compute.</p>
-                        <p lang="cn">设计和部署高性能数据中心解决方案，包括数据中心人工智能操作系统 (AIOS) 和先进的浸没液冷系统，以实现可持续计算。</p>
-                    </div>
-                </div>
-
-                <!-- 事业群 5: 工业4.0与智能制造 -->
-                <div class="card">
-                    <img src="/image/bu_industry40.jpg" alt="Industry 4.0" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/002D62/FFFFFF?text=Industry+4.0';">
-                    <div class="card-content">
-                        <h3 lang="en">Industry 4.0 &amp; Manufacturing</h3>
-                        <h3 lang="cn">工业4.0与智能制造</h3>
-                        <p lang="en">Implementing factory digital twins, AI-powered predictive maintenance, and robotic automation (UAVs) to create fully autonomous smart factories.</p>
-                        <p lang="cn">实施工厂数字孪生、人工智能驱动的预测性维护和机器人自动化 (包括无人机平台)，以创建全自动化的智能工厂。</p>
-                    </div>
-                </div>
-
-                <!-- 事业群 6: 战略投资 (CVC) -->
-                <div class="card">
-                    <img src="/image/bu_cvc.jpg" alt="Strategic Investment" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/002D62/FFFFFF?text=Strategic+Capital';">
-                    <div class="card-content">
-                        <h3 lang="en">Strategic Investment &amp; Capital</h3>
-                        <h3 lang="cn">战略投资与资本</h3>
-                        <p lang="en">Acting as an ecosystem enablement engine, our CVC arm invests in cutting-edge Deep Tech startups globally, providing them capital, technical validation, and market access.</p>
-                        <p lang="cn">作为生态赋能引擎，我们的CVC部门在全球范围内投资于尖端的深科技初创公司，为其提供资本、技术验证和市场准入。</p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- 成功案例 -->
-        <section>
-            <h2 lang="en">Success Cases</h2>
-            <h2 lang="cn">成功案例</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-
-                <!-- 案例 1: 东南亚智慧国度 -->
-                <div class="card">
-                    <img src="/image/case_smart_nation.jpg" alt="Smart Nation" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/005A9C/FFFFFF?text=Smart+Nation';">
-                    <div class="card-content">
-                        <h3 lang="en">Southeast Asia Smart Nation Initiative</h3>
-                        <h3 lang="cn">东南亚智慧国度计划</h3>
-                        <p lang="en">Master planning and deployment of a federated City OS for a major capital, integrating mobility, security, and public services.</p>
-                        <p lang="cn">为某主要首都提供总体规划，并部署联邦式城市操作系统 (City OS)，整合交通、安防与公共服务。</p>
-                        <div>
-                            <span class="tech-badge" lang="en">Digital Twin</span><span class="tech-badge" lang="cn">数字孪生</span>
-                            <span class="tech-badge" lang="en">City OS</span><span class="tech-badge" lang="cn">城市操作系统</span>
-                            <span class="tech-badge" lang="en">Advisory</span><span class="tech-badge" lang="cn">战略咨询</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 案例 2: 亚洲数据中心并购 -->
-                <div class="card">
-                    <img src="/image/case_dc_merger.jpg" alt="Data Center" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/005A9C/FFFFFF?text=Data+Center+M%26A';">
-                    <div class="card-content">
-                        <h3 lang="en">Pan-Asian Data Center M&amp;A Advisory</h3>
-                        <h3 lang="cn">泛亚数据中心并购咨询</h3>
-                        <p lang="en">Conducted technical due diligence for a major private equity fund, assessing the AI-readiness and cooling technology of a target portfolio.</p>
-                        <p lang="cn">为一家大型私募股权基金执行技术尽职调查，评估目标资产组合的人工智能就绪度和冷却技术。</p>
-                        <div>
-                            <span class="tech-badge" lang="en">Infrastructure</span><span class="tech-badge" lang="cn">基础设施</span>
-                            <span class="tech-badge" lang="en">Immersion Cooling</span><span class="tech-badge" lang="cn">浸没液冷</span>
-                            <span class="tech-badge" lang="en">CVC</span><span class="tech-badge" lang="cn">资本顾问</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 案例 3: 欧盟区工业4.0 -->
-                <div class="card">
-                    <img src="/image/case_industry40_eu.jpg" alt="Industry 4.0" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/005A9C/FFFFFF?text=EU+Industry+4.0';">
-                    <div class="card-content">
-                        <h3 lang="en">EU Industry 4.0 Smart Factory</h3>
-                        <h3 lang="cn">欧盟区工业4.0智能工厂</h3>
-                        <p lang="en">Designed and simulated a "lights-out" manufacturing plant using FEA/CFD simulation and autonomous drone-based quality control.</p>
-                        <p lang="cn">设计并仿真了一座“黑灯工厂”，采用了FEA/CFD仿真技术和基于无人机的自主质量控制系统。</p>
-                        <div>
-                            <span class="tech-badge" lang="en">Industry 4.0</span><span class="tech-badge" lang="cn">工业4.0</span>
-                            <span class="tech-badge" lang="en">Simulation</span><span class="tech-badge" lang="cn">仿真 (FEA/CFD)</span>
-                            <span class="tech-badge" lang="en">UAV Platform</span><span class="tech-badge" lang="cn">无人机平台</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 案例 4: 北美机场数字孪生 -->
-                <div class="card">
-                    <img src="/image/case_airport_na.jpg" alt="Airport" class="card-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/600x400/005A9C/FFFFFF?text=NA+Airport';">
-                    <div class="card-content">
-                        <h3 lang="en">North American Airport Digital Twin</h3>
-                        <h3 lang="cn">北美机场数字孪生</h3>
-                        <p lang="en">Deployed a Digital Twin platform for a major international airport to optimize passenger flow and predict baggage handling system failures.</p>
-                        <p lang="cn">为某大型国际机场部署了数字孪生平台，以优化乘客流线，并预测行李处理系统的故障。</p>
-                        <div>
-                            <span class="tech-badge" lang="en">Aviation</span><span class="tech-badge" lang="cn">智慧航空</span>
-                            <span class="tech-badge" lang="en">Digital Twin</span><span class="tech-badge" lang="cn">数字孪生</span>
-                            <span class="tech-badge" lang="en">Predictive AI</span><span class="tech-badge" lang="cn">预测性AI</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- 技术前瞻 -->
-        <section>
-            <h2 lang="en">Tech Foresight: Our R&amp;D Focus</h2>
-            <h2 lang="cn">技术前瞻：我们的研发焦点</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                <!-- 技术 1: 视觉AI -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Vision AI</h3><h3 class="mt-0 pt-0" lang="cn">视觉AI</h3>
-                    <p class="mb-0" lang="en">Developing lightweight, edge-native AI models for real-time video analytics, anomaly detection, and public safety.</p>
-                    <p class="mb-0" lang="cn">开发轻量级的、边缘原生的AI模型，用于实时视频分析、异常检测和公共安全。</p>
-                </div>
-                
-                <!-- 技术 2: 浸没液冷 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Immersion Cooling</h3><h3 class="mt-0 pt-0" lang="cn">浸没液冷</h3>
-                    <p class="mb-0" lang="en">Engineering next-generation liquid cooling solutions (single-phase and two-phase) for high-density GPU clusters, enabling sustainable AI.</p>
-                    <p class="mb-0" lang="cn">为高密度GPU集群设计下一代液冷解决方案（单相和两相），实现可持续的人工智能发展。</p>
-                </div>
-
-                <!-- 技术 3: 无人机平台 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.875L6 12z" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Autonomous UAV Platforms</h3><h3 class="mt-0 pt-0" lang="cn">自主无人机平台</h3>
-                    <p class="mb-0" lang="en">Building automated drone-in-a-box systems for industrial inspection, construction site monitoring, and smart factory logistics.</p>
-                    <p class="mb-0" lang="cn">构建“无人机机库”自动化系统，用于工业巡检、建筑工地监控和智能工厂物流。</p>
-                </div>
-
-                <!-- 技术 4: 数据中心AIOS -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Data Center AIOS</h3><h3 class="mt-0 pt-0" lang="cn">数据中心AIOS</h3>
-                    <p class="mb-0" lang="en">Developing an AI Operating System for data centers to automate resource allocation, optimize energy (PUE), and manage GPU workloads.</p>
-                    <p class="mb-0" lang="cn">开发数据中心的人工智能操作系统 (AIOS)，以自动执行资源分配、优化能源效率 (PUE) 和管理GPU工作负载。</p>
-                </div>
-
-                <!-- 技术 5: 数据安全与隐私 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Data Security &amp; Privacy</h3><h3 class="mt-0 pt-0" lang="cn">数据安全与隐私</h3>
-                    <p class="mb-0" lang="en">Implementing Federated Learning and advanced Privacy-Enhancing Technologies (PETs) to protect data sovereignty in multi-stakeholder systems.</p>
-                    <p class="mb-0" lang="cn">实施联邦学习和先进的隐私增强技术 (PETs)，以在多方参与者系统中保护数据主权。</p>
-                </div>
-                
-                <!-- 技术 6: ICT规划 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Next-Gen ICT Planning</h3><h3 class="mt-0 pt-0" lang="cn">下一代ICT规划</h3>
-                    <p class="mb-0" lang="en">Strategic planning for 5G/6G private networks, IoT sensor fabrics, and zero-trust security architectures for critical infrastructure.</p>
-                    <p class="mb-0" lang="cn">为关键基础设施进行5G/6G专网、物联网传感器网络和零信任安全架构的战略规划。</p>
-                </div>
-
-                <!-- 技术 7: 智慧建筑 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m-6.75-14.25h6.75c.621 0 1.125.504 1.125 1.125v1.125c0 .621-.504 1.125-1.125 1.125h-6.75V6.75zm0 6.75h6.75c.621 0 1.125.504 1.125 1.125v1.125c0 .621-.504 1.125-1.125 1.125h-6.75v-3.375z" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Intelligent Buildings</h3><h3 class="mt-0 pt-0" lang="cn">智能建筑</h3>
-                    <p class="mb-0" lang="en">Moving beyond BMS to create cognitive buildings that optimize energy, space, and occupant well-being in real-time.</p>
-                    <p class="mb-0" lang="cn">超越传统的BMS，创造能够实时优化能源、空间和使用者体验的“认知建筑”。</p>
-                </div>
-
-                <!-- 技术 8: 工业 4.0 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.52-.63.52-1.562 0-2.192l-2.496-3.03M11.42 15.17L5.704 5.704m-2.122 2.122l1.263 1.263M5.704 5.704l2.496 3.03c.52.63.52 1.562 0 2.192l-2.496 3.03m0 0l-2.122 2.122M5.704 5.704L3.582 3.582" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Industry 4.0</h3><h3 class="mt-0 pt-0" lang="cn">工业4.0</h3>
-                    <p class="mb-0" lang="en">AI-driven process control, predictive quality assurance, and automated material handling for resilient supply chains.</p>
-                    <p class="mb-0" lang="cn">人工智能驱动的过程控制、预测性质保以及自动化物料搬运，以打造高弹性的供应链。</p>
-                </div>
-
-                <!-- 技术 9: 高级仿真 -->
-                <div class="p-6 bg-gray-50 rounded-lg">
-                    <svg class="tech-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
-                    <h3 class="mt-0 pt-0" lang="en">Advanced Simulation (CFD/FEA)</h3><h3 class="mt-0 pt-0" lang="cn">高级仿真 (CFD/FEA)</h3>
-                    <p class="mb-0" lang="en">Using AI-accelerated simulation (CFD, FEA) to model complex physics for data center cooling, aerodynamics, and structural integrity.</p>
-                    <p class="mb-0" lang="cn">使用AI加速仿真 (CFD, FEA) 来模拟数据中心冷却、空气动力学和结构完整性等复杂物理现象。</p>
-                </div>
-
-            </div>
-        </section>
-        
-        <!-- 呼吁行动 (CTA) -->
-        <section class="cta-section">
-            <h2 lang="en">Let's Build the Future Together</h2>
-            <h2 lang="cn">让我们共建未来</h2>
-            <p lang="en">
-                We are actively seeking partners, clients, and talent who share our passion for solving complex challenges with Deep Tech.
-            </p>
-            <p lang="cn">
-                我们正在积极寻找合作伙伴、客户和顶尖人才，与我们分享用深科技解决复杂挑战的热情。
-            </p>
-            <a href="mailto:contact@nesgroup.com" class="cta-button">
-                <span lang="en">Contact Us</span>
-                <span lang="cn">联系我们</span>
-            </a>
-        </section>
-
+    <section class="page" id="p1">
+    <div class="hero">
+      <h1 class="lang-cn">NES集团：构建智慧产业的未来</h1>
+      <h1 class="lang-en">NES Group: Building the Future of Deep Tech</h1>
+      <p class="lang-cn">以AI与ICT为核，驱动全球产业数字化转型</p>
+      <p class="lang-en">AI + ICT at the core. We build and scale deep‑tech platforms for the real economy.</p>
     </div>
 
-    <!-- 页脚 -->
-    <footer class="footer">
-        <div class="contact-info">
-            <span>
-                <span lang="en">Email: </span><span lang="cn">邮箱：</span>
-                <a href="mailto:contact@nesgroup.com" class="text-blue-600 hover:underline">contact@nesgroup.com</a>
-            </span>
-            <span>
-                <span lang="en">Phone: </span><span lang="cn">电话：</span>
-                +65 6123 4567
-            </span>
-            <span>
-                <span lang="en">Address: </span><span lang="cn">地址：</span>
-                123 Deep Tech Avenue, Singapore
-            </span>
+    <h2 class="lang-cn">我们的使命：从咨询洞察到价值共创</h2>
+    <h2 class="lang-en">Our Mission: From Consulting Insight to Co-Creating Value</h2>
+    <p class="lang-cn">NES集团自1994年成立以来，在智慧城市与建筑领域积累了深厚的咨询顾问经验。但我们意识到，真正的价值并不仅仅是“提供建议”，而是在于“创造并拥有价值”。</p>
+    <p class="lang-en">Founded in 1994, NES built a strong Smart City advisory base. We learned enduring value comes not from reports, but from <strong>building, owning and scaling core technology</strong>.</p>
+    <p class="lang-cn">因此，我们的使命已经升华：<strong>我们不再仅仅交付咨询报告，而是与客户共同构建、投资并交付定义未来的核心技术产品。</strong> 这一转变标志着我们从服务提供商转变为客户的长期价值共创伙伴，从一次性项目交付迈向可沉淀、可复利的价值创造。</p>
+    <p class="lang-en">Our mission shifted from advisory to execution: <strong>co‑create products with clients, invest where it matters, and scale what works</strong>. We move from one‑off projects to compounding outcomes.</p>
+    <p class="lang-cn">我们通过<strong>“核心技术自研”</strong>和<strong>“全球产业投资”</strong>双轮驱动，确保我们提供的不仅是当下的解决方案，更是通向未来的技术蓝图。</p>
+    <p class="lang-en">We operate a platform model that turns R&amp;D and investment into deployable products and GTM pipelines—today’s solutions with a clear roadmap to tomorrow.</p>
+
+    <h2 class="lang-cn">新加坡优势：我们的全球创新枢纽</h2>
+    </section>
+    <section class="page" id="p2">
+    <h2 class="lang-en">The Singapore Advantage: Our Global Innovation Hub</h2>
+    <p class="lang-cn">NES集团的全球总部设在新加坡，这为我们提供了无与伦比的战略优势。新加坡是全球公认的创新、科技和金融中心，其独特的生态系统为NES的发展提供了丰沃的土壤：</p>
+    <p class="lang-en">Singapore is our operating hub—an innovation, finance and talent center that accelerates Deep Tech from lab to market.</p>
+    <ul>
+      <li class="lang-cn"><strong>卓越的创新环境：</strong> 新加坡政府通过“智慧国度”（Smart Nation）计划，大力推动数字化和技术应用。其强大的知识产权保护、亲商政策和对R&D的巨额投入，使其成为全球深科技（Deep Tech）的试验场。</li>
+      <li class="lang-en"><strong>Superior Innovation Environment:</strong> The Singapore government's "Smart Nation" initiative actively drives digitalization and technology adoption. Its robust IP protection, pro-business policies, and significant R&D investments make it a global testbed for Deep Tech.</li>
+      <li class="lang-cn"><strong>顶尖的研发生态：</strong> 我们与新加坡世界级的大学、A*STAR等研究机构以及充满活力的初创企业社群紧密合作，使我们始终处于AI、ICT和可持续发展技术的最前沿。</li>
+      <li class="lang-en"><strong>World-Class R&D Ecosystem:</strong> We collaborate closely with Singapore's world-class universities, research institutes like A*STAR, and a vibrant startup community, keeping us at the forefront of AI, ICT, and sustainable technologies.</li>
+      <li class="lang-cn"><strong>全球人才高地：</strong> 新加坡吸引了来自世界各地的顶尖科技人才，为NES的R&D引擎提供了源源不断的智力支持。</li>
+      <li class="lang-en"><strong>Global Talent Hub:</strong> Singapore attracts top-tier tech talent from around the world, providing a continuous stream of intellectual capital for our R&D engine.</li>
+      <li class="lang-cn"><strong>连接东西方的枢纽：</strong> 凭借其优越的地理位置和全球连通性，我们能够将源自亚洲的创新实践，与欧洲的先进制造标准相结合，为全球客户提供具有国际视野的本地化解决方案。</li>
+      <li class="lang-en"><strong>A Hub Connecting East and West:</strong> Its prime location and global connectivity allow us to blend Asian innovation with European manufacturing standards, delivering localized solutions with a global perspective to our clients worldwide.</li>
+    </ul>
+    <p class="lang-cn">植根于此，NES集团不仅是一家公司，更是这个全球创新生态系统的积极参与者和贡献者。我们利用新加坡的枢纽优势，将最前沿的技术和理念转化为稳定、可靠、可扩展的商业解决方案，服务我们遍布<strong>东盟（ASEAN）、欧盟（EU）和北美（North America）</strong>的全球客户群，帮助他们在激烈的国际竞争中保持领先。</p>
+    <p class="lang-en">From Singapore we convert innovation into <strong>scalable, de‑risked, commercially executable solutions</strong> across ASEAN, the EU and North America.</p>
+
+    <h2 class="lang-cn">核心事业群</h2>
+    </section>
+    <section class="page" id="p3">
+    <h2 class="lang-en">Core Business Groups</h2>
+    <p class="lang-cn">我们专注于智慧产业的核心领域，将AI、ICT、大数据和物联网（IoT）深度融合，为实体产业提供强大的数字化引擎。</p>
+    <p class="lang-en">We integrate AI, ICT, data and IoT into a deployable stack that powers real‑world operations.</p>
+
+    <h3 class="lang-cn">智慧城市与OS事业群</h3>
+    <h3 class="lang-en">Smart City & OS Group</h3>
+    <p class="lang-cn">该事业群构建城市的“数字大脑”。通过融合BIM（建筑信息模型）、IoT实时数据和AI分析，我们为城市管理者、机场和大型园区构建一个可交互、可仿真的数字孪生平台。这使得“运营仿真”、“预测性维护”和“应急响应”成为可能，全面提升运营效率和安全性。</p>
+    <p class="lang-en">We build a city‑scale Digital Twin that fuses BIM, IoT and AI to enable operational simulation, predictive maintenance and faster incident response.</p>
+
+    <h3 class="lang-cn">智慧交通事业群</h3>
+    <h3 class="lang-en">Smart Transportation Group</h3>
+    <p class="lang-cn">我们不仅仅是提供交通咨询。我们开发基于AI的“交通代理”（Traffic AI Agents），可部署在边缘计算网关上。这些智能体能够实时分析视频流，动态优化交叉路口信号灯、识别交通事故，并通过V2X（车路协同）技术，为未来的自动驾驶提供关键决策支持，有效缓解城市拥堵。</p>
+    <p class="lang-en">Edge‑deployed Traffic AI Agents optimize signals, detect incidents and support V2X—reducing peak congestion with real‑time control.</p>
+
+    <h3 class="lang-cn">智慧航空事业群</h3>
+    <h3 class="lang-en">Smart Aviation Group</h3>
+    <p class="lang-cn">机场是技术集成度最高的“小型城市”。我们提供“智慧机场数字孪生SaaS平台”，帮助机场运营商实现：</p>
+    <p class="lang-en">Airports are "mini-cities" with the highest degree of technological integration. We provide a "Smart Airport Digital Twin SaaS Platform" that helps airport operators achieve:</p>
+    <ul>
+      <li class="lang-cn"><strong>运营仿真与优化：</strong> 模拟旅客流动和行李处理，优化资源配置。</li>
+      <li class="lang-en"><strong>Operational Simulation & Optimization:</strong> Simulate passenger flow and baggage handling to optimize resource allocation.</li>
+      <li class="lang-cn"><strong>资产预测性维护：</strong> 提前预测登机桥、行李系统等关键资产的故障。</li>
+      <li class="lang-en"><strong>Asset Predictive Maintenance:</strong> Proactively predict failures in critical assets like jet bridges and baggage handling systems.</li>
+      <li class="lang-cn"><strong>可持续性（ESG）管理：</strong> 实时跟踪和管理碳排放，助力实现“绿色机场”。</li>
+      <li class="lang-en"><strong>Sustainability (ESG) Management:</strong> Track and manage carbon emissions in real-time to help achieve "Green Airport" goals.</li>
+    </ul>
+
+    <h3 class="lang-cn">智能基础设施事业群</h3>
+    <h3 class="lang-en">Intelligent Infrastructure Group</h3>
+    <p class="lang-cn">在AI时代，算力就是核心资产。我们研发专为严苛环境（如路边、隧道）设计的“NES边缘计算网关”。这款加固型硬件内置AI加速芯片，可在数据源头即时处理信息，实现超低延迟、高效率和数据隐私的本地化保护，是实现智慧交通和智慧建筑的坚实基础。</p>
+    <p class="lang-en">Our rugged NES Edge Gateway brings AI compute to the source for ultra‑low latency, efficiency and on‑site data privacy—foundational for smart transport and buildings.</p>
+
+    <h3 class="lang-cn">工业4.0与智能制造</h3>
+    <h3 class="lang-en">Industry 4.0 & Smart Manufacturing</h3>
+    <p class="lang-cn">我们为制造业提供端到端的工业4.0解决方案。通过构建智能工厂的数字孪生模型、C2M（客户到制造）柔性供应链、以及AI驱动的预测性维护，我们帮助传统工业实现向高效、低碳、柔性生产的转型。</p>
+    <p class="lang-en">We deliver Industry 4.0 with factory Digital Twins, C2M flexibility and AI‑driven maintenance to raise throughput and cut emissions.</p>
+
+    <h3 class="lang-cn">战略投资与资本事业群</h3>
+    <h3 class="lang-en">Strategic Investment & Capital Group</h3>
+    <p class="lang-cn">本事业群是集团的“生态赋能引擎”。我们不仅是财务投资者，更是战略合作伙伴。我们总部位于新加坡，利用全球金融中心的优势，在全球范围内发掘并投资于“深科技”（Deep Tech）初创企业。我们的投资严格围绕集团的核心技术版图（AI、ICT、可持续发展），通过资本注入、市场准入和技术协同，为被投企业赋能，同时补全集团的技术拼图，构建一个自我进化的强大生态系统。</p>
+    <p class="lang-en">Our Capital group is an <strong>ecosystem accelerator</strong>: strategic CVC + market access + technical integration. We invest in Deep Tech aligned to our stack and scale it through customers.</p>
+
+    <h2 class="lang-cn">技术前瞻</h2>
+    </section>
+    <section class="page" id="p4">
+    <h2 class="lang-en">Technology Foresight</h2>
+    <p class="lang-cn">我们持续投资于定义未来的前沿技术，确保我们的解决方案始终保持领先。</p>
+    <p class="lang-en">We back frontier capabilities and bring them to market ahead of the curve.</p>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/visual-ai.jpg')">
+          <span class="ph-text">视觉AI / Visual AI</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
         </div>
-        <p class="text-sm">
-            © 2025 NES Group. All rights reserved.
-        </p>
-    </footer>
+        <h4 class="lang-cn">视觉AI</h4>
+        <h4 class="lang-en">Visual AI</h4>
+        <p class="lang-cn">分析海量视频流，赋能交通、安防与工业质检。</p>
+        <p class="lang-en">Analyzing massive video streams to empower transportation, security, and industrial quality control.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/immersion-cooling.jpg')">
+          <span class="ph-text">浸没液冷 / Immersion Cooling</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">浸没液冷</h4>
+        <h4 class="lang-en">Immersion Liquid Cooling</h4>
+        <p class="lang-cn">为高密度AI数据中心提供极致散热，实现绿色算力。</p>
+        <p class="lang-en">Providing ultimate cooling for high-density AI data centers to enable sustainable, green computing.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/uav.jpg')">
+          <span class="ph-text">无人机平台 / UAV Platform</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">无人机平台</h4>
+        <h4 class="lang-en">UAV Platform</h4>
+        <p class="lang-cn">打造低空无人机协同平台，用于巡检、物流与应急响应。</p>
+        <p class="lang-en">Building a low-altitude drone coordination platform for inspection, logistics, and emergency response.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/dc-aios.jpg')">
+          <span class="ph-text">数据中心AIOS / DC AIOS</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">数据中心AIOS</h4>
+        <h4 class="lang-en">Data Center AIOS</h4>
+        <p class="lang-cn">面向AI的数据中心操作系统，智能调度GPU算力资源。</p>
+        <p class="lang-en">An AI-oriented data center operating system for intelligent scheduling and orchestration of GPU resources.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/data-security.jpg')">
+          <span class="ph-text">数据安全 / Data Security</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">数据安全</h4>
+        <h4 class="lang-en">Data Security</h4>
+        <p class="lang-cn">采用联邦学习和隐私计算，保障跨域数据协作的绝对安全。</p>
+        <p class="lang-en">Utilizing federated learning and confidential computing to ensure security in cross-domain data collaboration.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/ict.jpg')">
+          <span class="ph-text">ICT规划 / ICT Planning</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">ICT规划</h4>
+        <h4 class="lang-en">ICT Planning</h4>
+        <p class="lang-cn">规划下一代5G/6G与物联网（IoT）融合网络架构。</p>
+        <p class="lang-en">Planning next-generation 5G/6G and converged Internet of Things (IoT) network architectures.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/smart-building.jpg')">
+          <span class="ph-text">智慧建筑 / Smart Building</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">智慧建筑</h4>
+        <h4 class="lang-en">Smart Building</h4>
+        <p class="lang-cn">基于数字孪生与AIoT，实现建筑的自主感知、决策与节能。</p>
+        <p class="lang-en">Enabling buildings to autonomously perceive, decide, and optimize energy based on digital twins and AIoT.</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/industry4.jpg')">
+          <span class="ph-text">工业4.0 / Industry 4.0</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">工业4.0</h4>
+        <h4 class="lang-en">Industry 4.0</h4>
+        <p class="lang-cn">构建智能工厂模型，通过C2M（客户到制造）重塑供应链。</p>
+        <p class="lang-en">Building smart factory models and reshaping supply chains through C2M (Customer-to-Manufacturer).</p>
+      </div>
+      <div class="tech-card">
+        <div class="tech-img" style="--img:url('images/simulation.jpg')">
+          <span class="ph-text">仿真 (CFD & FEA) / Simulation</span>
+          <i class="tech-img-real" aria-hidden="true"></i>
+        </div>
+        <h4 class="lang-cn">仿真 (CFD & FEA)</h4>
+        <h4 class="lang-en">Simulation (CFD & FEA)</h4>
+        <p class="lang-cn">运用流体动力学与有限元分析，在数字世界中验证和优化工程设计。</p>
+        <p class="lang-en">Using CFD and FEA to validate and optimize complex engineering designs in the digital world.</p>
+      </div>
+    </div>
 
+    <h2 class="lang-cn">我们为何与众不同：自研 + 生态 + 股权投资</h2>
+    </section>
+    <section class="page" id="p5">
+    <h2 class="lang-en">Why We Are Different: R&amp;D + Ecosystem + Equity Investment</h2>
+<p class="lang-en">Our edge is a <strong>three‑flywheel value engine</strong> that compounds:</p>
+<ol>
+  <li class="lang-en"><strong>Proprietary R&amp;D:</strong> Own mission‑critical IP in AI, ICT and infra; ship production‑grade systems.</li>
+  <li class="lang-en"><strong>Open Ecosystem (CVC):</strong> Partner and invest to add capabilities fast—sensor to silicon to software.</li>
+  <li class="lang-en"><strong>Equity Co‑Investment:</strong> Align incentives with clients and partners; share upside from scaled deployment.</li>
+</ol>
+<p class="lang-en"><strong>What it means for you:</strong> we can source, invest and integrate best‑in‑class tech into your solution—then scale it with you.</p>
+<h2 class="lang-en">Case Studies</h2>
 
-    <script>
-        // 最终修复版的 JavaScript 切换逻辑
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleButton = document.getElementById('lang-toggle');
-            const body = document.body;
-            
-            // 标题的中英文版本
-            const titles = {
-                en: "NES Group: Building the Future of Deep Tech",
-                cn: "NES 集团：构建深科技未来"
-            };
+    <div class="case-grid">
+      <div class="case-card">
+        <div class="case-banner">Case 1 — Airport Digital Twin</div>
+        <h3 class="case-head lang-cn">亚洲某枢纽机场数字孪生</h3>
+        <h3 class="case-head lang-en">Digital Twin for a Major Asian Hub Airport</h3>
+        <p class="case-desc lang-cn">建设完整的数字孪生SaaS平台，优化旅客流与行李周转；基于预测性维护提高关键资产可用性与维护准确率。</p>
+        <p class="case-desc lang-en">Digital Twin SaaS for a hub airport; improved flow and asset uptime via predictive maintenance.</p>
+        <span class="tag lang-cn">智慧航空</span><span class="tag lang-en">Smart Aviation</span>
+        <span class="tag">AI</span><span class="tag">IoT</span>
+      </div>
 
-            function toggleLanguage() {
-                // 检查当前激活的语言
-                if (body.classList.contains('lang-en-active')) {
-                    // 切换到中文
-                    body.classList.remove('lang-en-active');
-                    body.classList.add('lang-cn-active');
-                    document.title = titles.cn; // 切换网页标题
-                } else {
-                    // 切换到英文
-                    body.classList.remove('lang-cn-active');
-                    body.classList.add('lang-en-active');
-                    document.title = titles.en; // 切换网页标题
-                }
-            }
+      <div class="case-card">
+        <div class="case-banner">Case 2 — Data Center M&A Tech DD</div>
+        <h3 class="case-head lang-cn">亚洲数据中心并购技术尽调</h3>
+        <h3 class="case-head lang-en">Technical Due Diligence for DC M&A</h3>
+        <p class="case-desc lang-cn">为全球私募股权基金提供并购目标的冷却系统（含浸没液冷）、PUE 与 AI 负载承载能力评估，形成技术尽调报告。</p>
+        <p class="case-desc lang-en">Technical DD on cooling (incl. immersion), PUE and AI‑readiness for a PE target; delivered an investment‑grade report.</p>
+        <span class="tag lang-cn">智能基础设施</span><span class="tag lang-en">Infra</span>
+        <span class="tag">M&A</span><span class="tag">Liquid Cooling</span>
+      </div>
 
-            // 确保按钮存在后再绑定事件
-            if (toggleButton) {
-                toggleButton.addEventListener('click', toggleLanguage);
-            }
-        });
-    </script>
+      <div class="case-card">
+        <div class="case-banner">Case 3 — Industry 4.0 EU</div>
+        <h3 class="case-head lang-cn">欧盟区工业4.0智能工厂</h3>
+        <h3 class="case-head lang-en">Industry 4.0 Smart Factory in EU</h3>
+        <p class="case-desc lang-cn">为汽车零部件龙头部署 C2M 柔性产线与视觉AI质检系统；单次交付周期缩短，产费率显著下降。</p>
+        <p class="case-desc lang-en">C2M lines + Visual AI QA for an EU plant; shorter cycle times and lower defect rates.</p>
+        <span class="tag">Industry 4.0</span><span class="tag">Visual AI</span>
+      </div>
 
+      <div class="case-card">
+        <div class="case-banner">Case 4 — ASEAN Smart Mobility</div>
+        <h3 class="case-head lang-cn">东盟某城市智慧交通网络</h3>
+        <h3 class="case-head lang-en">Smart Mobility Network in ASEAN</h3>
+        <p class="case-desc lang-cn">部署上千个边缘计算网关与交通AI代理，覆盖核心城区，峰值时段平均拥堵时长显著降低。</p>
+        <p class="case-desc lang-en">Citywide roll‑out of edge gateways + Traffic AI Agents; measurable peak‑hour congestion reduction.</p>
+        <span class="tag">Edge</span><span class="tag">V2X</span><span class="tag">AI Agents</span>
+      </div>
+    </div>
+
+    <div class="cta" id="cta">
+      <h3 class="lang-cn">准备共创一个更强的增长曲线？</h3>
+      <h3 class="lang-en">Ready to Co‑Create a Stronger Growth Curve?</h3>
+      <p class="lang-cn">我们提供从战略到落地的一体化方案：自研产品 × 生态协同 × 股权共投（VC版）。</p>
+      <p class="lang-en">End‑to‑end delivery: proprietary R&amp;D × ecosystem partnerships × equity co‑investment.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#contact">联系 / Contact</a>
+        <a class="btn btn-outline" href="#contact">Book a 20‑min Intro</a>
+      </div>
+    </div>
+
+    <div class="contact" id="contact">
+      <h4 class="lang-cn">联系 NES</h4>
+      <h4 class="lang-en">Contact NES</h4>
+      <p class="lang-cn">商务邮箱：<a href="mailto:bd@nes.example">bd@nes.example</a>　｜　投资合作：<a href="mailto:vc@nes.example">vc@nes.example</a></p>
+      <p class="lang-en">Business: <a href="mailto:bd@nes.example">bd@nes.example</a> · Ventures: <a href="mailto:vc@nes.example">vc@nes.example</a></p>
+      <p class="lang-cn">新加坡电话：<a href="tel:+6500000000">+65 0000 0000</a>　｜　地址：Singapore HQ（可替换为真实地址）</p>
+      <p class="lang-en">Singapore: <a href="tel:+6500000000">+65 0000 0000</a> · Address: Singapore HQ (replace with real)</p>
+      <p class="lang-cn">微信 / WhatsApp：请邮件索取或在提交表单中留下联系方式。</p>
+      <p class="lang-en">WeChat / WhatsApp: request via email or share in the intro form.</p>
+    </div>
+
+    <hr style="border:0; border-top:1px solid #eee; margin: 40px 0;" />
+
+    <h2 class="lang-cn">与我们共创未来</h2>
+    <h2 class="lang-en">Co‑Create the Future with Us</h2>
+<p class="lang-en">Transformation favors builders. NES partners from strategy to deployment to create durable value.</p>
+<p class="lang-en"><strong>Let’s scope your use‑case.</strong></p>
+<div class="footer">
+      <p class="lang-cn">&copy; 2025 NES 集团. 版权所有.</p>
+      <p class="lang-en">&copy; 2025 NES Group. All Rights Reserved.</p>
+    </div>
+    </section>
+
+    <nav class="pager" aria-label="Pages">
+      <a href="#p1" class="dot" aria-label="Hero">&bull;</a>
+      <a href="#p2" class="dot" aria-label="Singapore">&bull;</a>
+      <a href="#p3" class="dot" aria-label="Core">&bull;</a>
+      <a href="#p4" class="dot" aria-label="Tech">&bull;</a>
+      <a href="#p5" class="dot" aria-label="Why/Case/Contact">&bull;</a>
+    </nav>
+  </div>
 </body>
 </html>
